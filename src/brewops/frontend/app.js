@@ -18,10 +18,23 @@ function renderDrinkBars(perDrink) {
   for (const drink of perDrink) {
     const row = document.createElement("div");
     row.className = "bar-row";
-    row.innerHTML = `
-      <span class="bar-label">${drink.label}</span>
-      <span class="bar-track"><span class="bar-fill" style="width:${(drink.count / max) * 100}%"></span></span>
-      <span class="bar-count">${drink.count}</span>`;
+
+    const label = document.createElement("span");
+    label.className = "bar-label";
+    label.textContent = drinkLabel(drink.name, drink.label);
+
+    const track = document.createElement("span");
+    track.className = "bar-track";
+    const fill = document.createElement("span");
+    fill.className = "bar-fill";
+    fill.style.width = `${(drink.count / max) * 100}%`;
+    track.appendChild(fill);
+
+    const count = document.createElement("span");
+    count.className = "bar-count";
+    count.textContent = drink.count;
+
+    row.append(label, track, count);
     container.appendChild(row);
   }
 }
@@ -43,7 +56,7 @@ function renderTimeline(perDay) {
     rect.setAttribute("height", barHeight);
     rect.setAttribute("class", "timeline-bar");
     const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
-    title.textContent = `${day.day}: ${day.count} brews`;
+    title.textContent = t("tooltip_day", { day: day.day, n: day.count });
     rect.appendChild(title);
     svg.appendChild(rect);
   });
@@ -55,26 +68,52 @@ function renderMachineCards(healths) {
   for (const m of healths) {
     const card = document.createElement("div");
     card.className = "card";
+
     const maintenance = m.last_maintenance
-      ? `${m.last_maintenance.type} on ${m.last_maintenance.timestamp.slice(0, 10)}`
-      : "none on record";
-    const errors = m.recent_errors.length
-      ? `<p class="errors">Recent errors: ${m.recent_errors
-          .map((e) => `${e.error_code || "?"} (${e.timestamp.slice(0, 10)})`)
-          .join(", ")}</p>`
-      : "";
-    card.innerHTML = `
-      <h3>${m.name}</h3>
-      <p class="badge">${m.has_telemetry ? "telemetry" : "manual log"}</p>
-      <p>${m.brew_count} brews · last ${m.last_brew ? m.last_brew.slice(0, 16) : "never"}</p>
-      <p>Last maintenance: ${maintenance}</p>
-      ${errors}`;
+      ? t("maintenance_on", {
+          type: maintenanceLabel(m.last_maintenance.type),
+          date: m.last_maintenance.timestamp.slice(0, 10),
+        })
+      : t("no_maintenance_on_record");
+
+    const name = document.createElement("h3");
+    name.textContent = m.name;
+
+    const badge = document.createElement("p");
+    badge.className = "badge";
+    badge.textContent = m.has_telemetry ? t("telemetry") : t("manual_log");
+
+    const brewLine = document.createElement("p");
+    brewLine.textContent = t("brews_last_suffix", {
+      n: m.brew_count,
+      when: m.last_brew ? m.last_brew.slice(0, 16) : t("never"),
+    });
+
+    const maintenanceLine = document.createElement("p");
+    maintenanceLine.textContent = t("last_maintenance_prefix", { v: maintenance });
+
+    card.append(name, badge, brewLine, maintenanceLine);
+
+    if (m.recent_errors.length) {
+      const errorsLine = document.createElement("p");
+      errorsLine.className = "errors";
+      const summary = m.recent_errors
+        .map((e) => `${e.error_code || "?"} (${e.timestamp.slice(0, 10)})`)
+        .join(", ");
+      errorsLine.textContent = t("recent_errors_prefix", { v: summary });
+      card.appendChild(errorsLine);
+    }
+
     container.appendChild(card);
   }
 }
 
+let lastStats = null;
+let lastHealths = null;
+
 async function loadDashboard() {
   const stats = await fetchJSON("/api/stats");
+  lastStats = stats;
   document.getElementById("total-brews").textContent = stats.total_brews;
   const lastDay = stats.per_day[stats.per_day.length - 1];
   document.getElementById("brews-today").textContent = lastDay ? lastDay.count : 0;
@@ -84,7 +123,16 @@ async function loadDashboard() {
   const machines = await fetchJSON("/api/machines");
   document.getElementById("machine-count").textContent = machines.length;
   const healths = await Promise.all(machines.map((m) => fetchJSON(`/api/machines/${m.id}`)));
+  lastHealths = healths;
   renderMachineCards(healths);
+}
+
+function rerenderDashboard() {
+  if (lastStats) {
+    renderDrinkBars(lastStats.per_drink);
+    renderTimeline(lastStats.per_day);
+  }
+  if (lastHealths) renderMachineCards(lastHealths);
 }
 
 // ---- forms ----
@@ -95,21 +143,29 @@ function localNow() {
   return now.toISOString().slice(0, 16); // datetime-local format
 }
 
-function fillSelect(select, items, valueKey, labelKey) {
+function fillSelect(select, items, valueKey, labelKey, transform) {
   select.innerHTML = "";
   for (const item of items) {
     const option = document.createElement("option");
     option.value = item[valueKey];
-    option.textContent = item[labelKey];
+    option.textContent = transform ? transform(item) : item[labelKey];
     select.appendChild(option);
   }
+}
+
+let lastDrinks = null;
+
+function refillDrinkSelect() {
+  if (!lastDrinks) return;
+  fillSelect(document.getElementById("brew-drink"), lastDrinks, "name", "label", (d) => drinkLabel(d.name, d.label));
 }
 
 async function setupForms() {
   const machines = await fetchJSON("/api/machines");
   const drinks = await fetchJSON("/api/drink-types");
+  lastDrinks = drinks;
   fillSelect(document.getElementById("brew-machine"), machines, "id", "name");
-  fillSelect(document.getElementById("brew-drink"), drinks, "name", "label");
+  refillDrinkSelect();
   fillSelect(document.getElementById("maintenance-machine"), machines, "id", "name");
   document.getElementById("brew-timestamp").value = localNow();
   document.getElementById("maintenance-timestamp").value = localNow();
@@ -143,7 +199,7 @@ async function submitForm(event, url, messageId, buildPayload) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(buildPayload()),
     });
-    message.textContent = "Logged.";
+    message.textContent = t("logged_ok");
     message.classList.add("ok");
     await loadDashboard();
   } catch (error) {

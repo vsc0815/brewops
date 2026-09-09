@@ -8,8 +8,14 @@
 </head>
 <body>
   <header>
-    <h1>BrewOps</h1>
-    <p class="tagline">Office coffee fleet — telemetry &amp; operations</p>
+    <div class="header-titles">
+      <h1>BrewOps</h1>
+      <p class="tagline" data-i18n="tagline">Office coffee fleet — telemetry &amp; operations</p>
+    </div>
+    <div class="lang-toggle" role="group" aria-label="Language / 语言">
+      <button type="button" class="lang-btn active" data-lang="en">EN</button>
+      <button type="button" class="lang-btn" data-lang="zh">中文</button>
+    </div>
   </header>
 
   <main>
@@ -18,81 +24,82 @@
       <div class="stat-tiles">
         <div class="tile">
           <span class="tile-number" id="total-brews">–</span>
-          <span class="tile-label">brews total</span>
+          <span class="tile-label" data-i18n="tile_total_brews">brews total</span>
         </div>
         <div class="tile">
           <span class="tile-number" id="brews-today">–</span>
-          <span class="tile-label">brews on last active day</span>
+          <span class="tile-label" data-i18n="tile_brews_today">brews on last active day</span>
         </div>
         <div class="tile">
           <span class="tile-number" id="machine-count">–</span>
-          <span class="tile-label">machines</span>
+          <span class="tile-label" data-i18n="tile_machines">machines</span>
         </div>
       </div>
 
       <div class="panel">
-        <h2>Per drink</h2>
+        <h2 data-i18n="hdg_per_drink">Per drink</h2>
         <div id="drink-bars"></div>
       </div>
 
       <div class="panel">
-        <h2>Brews over time</h2>
+        <h2 data-i18n="hdg_brews_over_time">Brews over time</h2>
         <svg id="timeline" viewBox="0 0 600 130" preserveAspectRatio="none" role="img"
-             aria-label="Brews per day"></svg>
+             aria-label="Brews per day" data-i18n-aria-label="aria_timeline"></svg>
       </div>
 
       <div class="panel">
-        <h2>Machines</h2>
+        <h2 data-i18n="hdg_machines">Machines</h2>
         <div id="machine-cards" class="cards"></div>
       </div>
     </section>
 
     <!-- Zone 2: log a brew (manual entry for machines without telemetry) -->
     <section class="panel form-panel">
-      <h2>Log a brew</h2>
-      <p class="hint">For machines that don't report their own events — looking at you, Old Faithful.</p>
+      <h2 data-i18n="hdg_log_brew">Log a brew</h2>
+      <p class="hint" data-i18n="hint_log_brew">For machines that don't report their own events — looking at you, Old Faithful.</p>
       <form id="brew-form">
-        <label for="brew-machine">Machine</label>
+        <label for="brew-machine" data-i18n="label_machine">Machine</label>
         <select id="brew-machine" required></select>
 
-        <label for="brew-drink">Drink</label>
+        <label for="brew-drink" data-i18n="label_drink">Drink</label>
         <select id="brew-drink" required></select>
 
-        <label for="brew-timestamp">When</label>
+        <label for="brew-timestamp" data-i18n="label_when">When</label>
         <input type="datetime-local" id="brew-timestamp" required>
 
-        <button type="submit" id="brew-submit">Log brew</button>
+        <button type="submit" id="brew-submit" data-i18n="btn_log_brew">Log brew</button>
         <p id="brew-message" class="message" role="status"></p>
       </form>
     </section>
 
     <!-- Zone 3: log maintenance -->
     <section class="panel form-panel">
-      <h2>Log maintenance</h2>
+      <h2 data-i18n="hdg_log_maintenance">Log maintenance</h2>
       <form id="maintenance-form">
-        <label for="maintenance-machine">Machine</label>
+        <label for="maintenance-machine" data-i18n="label_machine">Machine</label>
         <select id="maintenance-machine" required></select>
 
-        <label for="maintenance-type">Type</label>
+        <label for="maintenance-type" data-i18n="label_type">Type</label>
         <select id="maintenance-type" required>
-          <option value="descale">Descale</option>
-          <option value="refill">Refill</option>
-          <option value="repair">Repair</option>
-          <option value="error">Error</option>
+          <option value="descale" data-i18n="opt_descale">Descale</option>
+          <option value="refill" data-i18n="opt_refill">Refill</option>
+          <option value="repair" data-i18n="opt_repair">Repair</option>
+          <option value="error" data-i18n="opt_error">Error</option>
         </select>
 
-        <label for="maintenance-timestamp">When</label>
+        <label for="maintenance-timestamp" data-i18n="label_when">When</label>
         <input type="datetime-local" id="maintenance-timestamp" required>
 
-        <label for="maintenance-note">Note</label>
-        <input type="text" id="maintenance-note" placeholder="optional">
+        <label for="maintenance-note" data-i18n="label_note">Note</label>
+        <input type="text" id="maintenance-note" placeholder="optional" data-i18n-placeholder="placeholder_note">
 
-        <button type="submit" id="maintenance-submit">Log maintenance</button>
+        <button type="submit" id="maintenance-submit" data-i18n="btn_log_maintenance">Log maintenance</button>
         <p id="maintenance-message" class="message" role="status"></p>
       </form>
     </section>
   </main>
 
+  <script src="/i18n.js"></script>
   <script src="/app.js"></script>
 </body>
 </html>
