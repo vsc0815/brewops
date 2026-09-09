@@ -504,6 +504,150 @@ main {
   color: var(--warn);
 }
 
+/* ---- Coffee Flipper pinball minigame ---- */
+
+/* #dashboard sets display:grid via an ID selector, which beats the UA
+   [hidden] rule's specificity — without this, `hidden` alone wouldn't hide it. */
+#dashboard[hidden],
+.form-panel[hidden],
+.view-toggle-bar[hidden],
+#pinball-view[hidden] {
+  display: none;
+}
+
+.view-toggle-bar {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+}
+
+.view-toggle-bar button {
+  padding: 0.75rem 1.8rem;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--roast), #2c1d11);
+  color: var(--crema);
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.view-toggle-bar button:hover {
+  box-shadow: var(--shadow-lift);
+}
+
+.view-toggle-bar button:active {
+  transform: translateY(1px);
+}
+
+#pinball-view {
+  grid-column: 1 / -1;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.4rem 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.pinball-hud {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Approximate valantic-inspired accent palette — NOT verified official brand
+   colors; placeholder pending real brand assets. Minigame chrome only. */
+:root {
+  --valantic-navy: #12263a;
+  --valantic-navy-deep: #0a1826;
+  --valantic-teal: #1f8a8c;
+}
+
+.valantic-wordmark {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  color: var(--valantic-navy);
+  background: linear-gradient(135deg, #eaf3f3, #ffffff);
+  border: 1px solid var(--valantic-teal);
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+}
+
+.valantic-wordmark .dot {
+  color: var(--valantic-teal);
+}
+
+.pinball-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-family: var(--serif);
+}
+
+.pinball-stat-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+
+.pinball-stat-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--roast);
+  font-variant-numeric: tabular-nums;
+}
+
+#pinball-switch-back-btn {
+  margin-left: auto;
+  padding: 0.55rem 1.3rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--brass), var(--brass-deep));
+  color: #fff8ee;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgb(138 90 28 / 0.3);
+}
+
+#pinball-switch-back-btn:hover {
+  filter: brightness(1.07);
+}
+
+.pinball-stage {
+  max-width: 420px;
+  margin: 0 auto;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow-lift);
+  line-height: 0;
+}
+
+#pinball-canvas {
+  display: block;
+  width: 100%;
+  touch-action: none;
+}
+
+#pinball-view .hint {
+  text-align: center;
+  margin: 1rem 0 0;
+}
+
+#pinball-view .message {
+  text-align: center;
+  grid-column: auto;
+}
+
 ::selection {
   background: rgb(185 129 47 / 0.25);
 }

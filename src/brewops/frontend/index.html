@@ -20,7 +20,7 @@
 
   <main>
     <!-- Zone 1: dashboard -->
-    <section id="dashboard">
+    <section id="dashboard" class="dash-panel">
       <div class="stat-tiles">
         <div class="tile">
           <span class="tile-number" id="total-brews">–</span>
@@ -54,7 +54,7 @@
     </section>
 
     <!-- Zone 2: log a brew (manual entry for machines without telemetry) -->
-    <section class="panel form-panel">
+    <section class="panel form-panel dash-panel">
       <h2 data-i18n="hdg_log_brew">Log a brew</h2>
       <p class="hint" data-i18n="hint_log_brew">For machines that don't report their own events — looking at you, Old Faithful.</p>
       <form id="brew-form">
@@ -73,7 +73,7 @@
     </section>
 
     <!-- Zone 3: log maintenance -->
-    <section class="panel form-panel">
+    <section class="panel form-panel dash-panel">
       <h2 data-i18n="hdg_log_maintenance">Log maintenance</h2>
       <form id="maintenance-form">
         <label for="maintenance-machine" data-i18n="label_machine">Machine</label>
@@ -97,9 +97,39 @@
         <p id="maintenance-message" class="message" role="status"></p>
       </form>
     </section>
+
+    <!-- Zone 4: switch into the Coffee Flipper minigame -->
+    <div class="view-toggle-bar dash-panel">
+      <button type="button" id="start-pinball-btn" data-i18n="btn_start_pinball">Start Coffee Flipper</button>
+    </div>
+
+    <!-- Zone 5: Coffee Flipper pinball minigame (hidden until started) -->
+    <section id="pinball-view" hidden aria-label="Coffee Flipper">
+      <div class="pinball-hud">
+        <!-- Approximate, unverified placeholder wordmark — not the real valantic
+             logo; replace with official brand assets when available. -->
+        <span class="valantic-wordmark">valantic<span class="dot">.</span></span>
+        <span class="pinball-stat">
+          <span class="pinball-stat-label" data-i18n="pinball_score_label">Score</span>
+          <span class="pinball-stat-value" id="pinball-score">0</span>
+        </span>
+        <span class="pinball-stat">
+          <span class="pinball-stat-label" data-i18n="pinball_lives_label">Lives</span>
+          <span class="pinball-stat-value" id="pinball-lives">3</span>
+        </span>
+        <button type="button" id="pinball-switch-back-btn" data-i18n="btn_switch_back">Switch back</button>
+      </div>
+      <div class="pinball-stage">
+        <canvas id="pinball-canvas"></canvas>
+      </div>
+      <p class="hint" data-i18n="pinball_hint">Left/right arrow (or Z/M) to flip. Hold Space to charge the plunger, release to launch.</p>
+      <p id="pinball-message" class="message" role="status"></p>
+    </section>
   </main>
 
   <script src="/i18n.js"></script>
   <script src="/app.js"></script>
+  <script src="/pinball-table.js"></script>
+  <script src="/pinball.js"></script>
 </body>
 </html>
